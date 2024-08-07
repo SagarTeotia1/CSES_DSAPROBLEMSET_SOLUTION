@@ -3,18 +3,22 @@
 using namespace std;
 
 int main() {
-    int x, n;
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    long long x;
+    int n;
     cin >> x >> n;
-    set<int> positions = {0, x}; // initially, the ends of the street
-    multiset<int> lengths = {x}; // initially, the whole length
+    set<long long> positions = {0, x}; // initially, the ends of the street
+    multiset<long long> lengths = {x}; // initially, the whole length
 
     for (int i = 0; i < n; ++i) {
-        int p;
+        long long p;
         cin >> p;
         // Find the positions where the new light will split the segment
         auto it = positions.lower_bound(p);
-        int right = *it;
-        int left = *(--it);
+        long long right = *it;
+        long long left = *(--it);
 
         // Remove the current segment length
         lengths.erase(lengths.find(right - left));
