@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <unordered_map>
+#include <utility>
 
 using namespace std;
 
@@ -16,21 +17,32 @@ int main() {
     }
 
     // Hash map to store pairs of sums and their indices
-    unordered_map<long long, pair<int, int>> pairSums;
+    unordered_map<long long, vector<pair<int, int>>> pairSums;
 
     // Iterate through all pairs to populate the map
     for (int i = 0; i < n; ++i) {
         for (int j = i + 1; j < n; ++j) {
             long long currentSum = arr[i].first + arr[j].first;
-            if (pairSums.find(x - currentSum) != pairSums.end()) {
-                pair<int, int> p = pairSums[x - currentSum];
-                if (p.first != i && p.first != j && p.second != i && p.second != j) {
-                    cout << arr[i].second << " " << arr[j].second << " " 
-                         << arr[p.first].second << " " << arr[p.second].second << endl;
-                    return 0;
+            pairSums[currentSum].emplace_back(i, j);
+        }
+    }
+
+    // Iterate again to find the quadruplets
+    for (int i = 0; i < n; ++i) {
+        for (int j = i + 1; j < n; ++j) {
+            long long currentSum = arr[i].first + arr[j].first;
+            long long requiredSum = x - currentSum;
+            if (pairSums.find(requiredSum) != pairSums.end()) {
+                for (const auto& p : pairSums[requiredSum]) {
+                    int k = p.first;
+                    int l = p.second;
+                    if (i != k && i != l && j != k && j != l) {
+                        cout << arr[i].second << " " << arr[j].second << " "
+                             << arr[k].second << " " << arr[l].second << endl;
+                        return 0;
+                    }
                 }
             }
-            pairSums[currentSum] = {i, j};
         }
     }
 
