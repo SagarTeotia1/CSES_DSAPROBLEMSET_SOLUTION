@@ -6,13 +6,13 @@ using namespace std;
 
 int main() {
     ios::sync_with_stdio(false);
-    cin.tie(0);
+    cin.tie(nullptr);
 
     int n;
     long long x;
     cin >> n >> x;
+    
     vector<long long> arr(n);
-
     for (int i = 0; i < n; ++i) {
         cin >> arr[i];
     }
@@ -36,7 +36,7 @@ int main() {
         prefixSumCount[prefixSum]++;
     }
 
-    cout << count << endl;
+    cout << count << '\n';
 
     return 0;
 }
