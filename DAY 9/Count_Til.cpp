@@ -1,48 +1,62 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
 #include <cstring>
 using namespace std;
 
 const int MOD = 1e9 + 7;
 
-int dp[1024][1001]; // dp[mask][column]
+int n, m;
+vector<int> valid_masks;
+int dp[1001][1024];
+
+bool is_valid(int mask) {
+    int count = 0;
+    for (int i = 0; i < n; ++i) {
+        if (mask & (1 << i)) {
+            if (count % 2 != 0) return false;
+            count = 0;
+        } else {
+            count++;
+        }
+    }
+    return count % 2 == 0;
+}
+
+void find_valid_masks(int col_mask, int curr_row) {
+    if (curr_row == n) {
+        valid_masks.push_back(col_mask);
+        return;
+    }
+
+    // Place a vertical tile or leave the cell empty
+    find_valid_masks(col_mask, curr_row + 1);
+
+    // Place a horizontal tile if possible
+    if (curr_row + 1 < n && !(col_mask & (1 << curr_row)) && !(col_mask & (1 << (curr_row + 1)))) {
+        find_valid_masks(col_mask | (1 << curr_row) | (1 << (curr_row + 1)), curr_row + 2);
+    }
+}
 
 int main() {
-    int n, m;
     cin >> n >> m;
-    
-    dp[(1 << n) - 1][0] = 1;  // Initially, we have an empty column
-    
-    for (int j = 0; j < m; ++j) {
-        for (int mask = 0; mask < (1 << n); ++mask) {
-            if (dp[mask][j] == 0) continue;  // Skip if there's no valid tiling for this state
-            
-            for (int next_mask = 0; next_mask < (1 << n); ++next_mask) {
-                int state = 0;
-                
-                for (int i = 0; i < n; ++i) {
-                    if (mask & (1 << i)) continue;
-                    
-                    if (i + 1 < n && !(mask & (1 << (i + 1))) && !(next_mask & (1 << i)) && !(next_mask & (1 << (i + 1)))) {
-                        state |= (1 << i) | (1 << (i + 1));
-                        i++;
-                    } else if (!(next_mask & (1 << i))) {
-                        state |= (1 << i);
-                    } else {
-                        state = -1;
-                        break;
-                    }
-                }
-                
-                if (state != -1 && state == next_mask) {
-                    dp[next_mask][j + 1] = (dp[next_mask][j + 1] + dp[mask][j]) % MOD;
+
+    if (n > m) swap(n, m);
+
+    find_valid_masks(0, 0);
+
+    dp[0][0] = 1;  // Base case: zero columns, one way to fill (the empty grid)
+
+    for (int col = 1; col <= m; ++col) {
+        for (int mask : valid_masks) {
+            dp[col][mask] = 0;  // Initialize dp[col][mask]
+            for (int prev_mask : valid_masks) {
+                if ((mask & prev_mask) == 0) {  // Check if masks are compatible
+                    dp[col][mask] = (dp[col][mask] + dp[col - 1][prev_mask]) % MOD;
                 }
             }
         }
     }
-    
-    cout << dp[(1 << n) - 1][m] << endl;
-    
+
+    cout << dp[m][0] << endl;
     return 0;
 }
