@@ -2,13 +2,15 @@
 #include <vector>
 #include <queue>
 #include <tuple>
+#include <cstring> // For memset
+#include <algorithm> // For reverse
 
 using namespace std;
 
 const int MAXN = 1000;
 int n, m;
 vector<string> grid;
-pair<int, int> start, end;
+pair<int, int> start, destination;
 int dist[MAXN][MAXN];
 pair<int, int> parent[MAXN][MAXN];
 
@@ -30,7 +32,7 @@ bool bfs() {
         tie(x, y) = q.front();
         q.pop();
 
-        if (make_pair(x, y) == end) {
+        if (make_pair(x, y) == destination) {
             return true;
         }
 
@@ -51,7 +53,7 @@ bool bfs() {
 
 string reconstructPath() {
     string path;
-    pair<int, int> cur = end;
+    pair<int, int> cur = destination;
 
     while (cur != start) {
         pair<int, int> prev = parent[cur.first][cur.second];
@@ -75,15 +77,16 @@ int main() {
         cin >> grid[i];
         for (int j = 0; j < m; j++) {
             if (grid[i][j] == 'A') start = {i, j};
-            if (grid[i][j] == 'B') end = {i, j};
+            if (grid[i][j] == 'B') destination = {i, j};
         }
     }
 
     memset(dist, -1, sizeof(dist));
+    memset(parent, -1, sizeof(parent)); // Initialize parent array
 
     if (bfs()) {
         cout << "YES" << endl;
-        cout << dist[end.first][end.second] << endl;
+        cout << dist[destination.first][destination.second] << endl;
         cout << reconstructPath() << endl;
     } else {
         cout << "NO" << endl;
